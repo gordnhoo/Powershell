@@ -2,4 +2,4 @@
 My powershell Scripts
 
 
-Please don´t use any od these scripts for bad intentions
+Please don´t use any of these scripts for bad intentions
